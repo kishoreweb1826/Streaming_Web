@@ -6,12 +6,12 @@ import { Play, Search, TrendingUp, Tv, Film, ChevronLeft, Star, Clock, Layers, Z
 /* ============================================================ */
 /*  CONFIG & MEGA API LOADERS                                   */
 /* ============================================================ */
-const TMDB_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb"; 
+const TMDB_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb";
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
 function getEmbedUrl(server, type, id, season, episode, title = '') {
   if (type === 'movie') {
-    switch(server) {
+    switch (server) {
       case 1: return `https://vidsrc.net/embed/movie?tmdb=${id}`;
       case 2: return `https://autoembed.co/movie/tmdb/${id}`;
       case 3: return `https://multiembed.mov/?video_id=${id}&tmdb=1`;
@@ -23,7 +23,7 @@ function getEmbedUrl(server, type, id, season, episode, title = '') {
       default: return `https://vidsrc.net/embed/movie?tmdb=${id}`;
     }
   } else {
-    switch(server) {
+    switch (server) {
       case 1: return `https://vidsrc.net/embed/tv?tmdb=${id}&season=${season}&ep=${episode}`;
       case 2: return `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`;
       case 3: return `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
@@ -75,8 +75,8 @@ async function fetchLatestEpisodesFeed() {
         type: 'tv'
       };
     });
-    
-    return episodes.sort((a,b) => new Date(b.air_date) - new Date(a.air_date)).slice(0,6);
+
+    return episodes.sort((a, b) => new Date(b.air_date) - new Date(a.air_date)).slice(0, 6);
   } catch { return []; }
 }
 
@@ -85,11 +85,11 @@ async function fetchJikanLatestEpisodes() {
     const res = await fetch(`https://api.jikan.moe/v4/watch/episodes`);
     const data = (await res.json()).data || [];
     return data.slice(0, 6).map(item => ({
-      search_title: item.entry.title, 
+      search_title: item.entry.title,
       show_name: item.entry.title,
       poster: item.entry.images?.jpg?.image_url,
       episode: item.episodes[0]?.mal_id || 1,
-      season: 1, 
+      season: 1,
       is_jikan: true,
       type: 'tv'
     }));
@@ -98,10 +98,10 @@ async function fetchJikanLatestEpisodes() {
 
 async function fetchAnime(genreId = '') {
   try {
-    let params = genreId === 'airing' 
-      ? '&with_genres=16&first_air_date.gte=2024-01-01' 
+    let params = genreId === 'airing'
+      ? '&with_genres=16&first_air_date.gte=2024-01-01'
       : (genreId ? `&with_genres=16,${genreId}` : '&with_genres=16');
-      
+
     const res = await fetch(`${TMDB_BASE}/discover/tv?api_key=${TMDB_KEY}${params}&with_original_language=ja&sort_by=popularity.desc`);
     return (await res.json()).results || [];
   } catch { return []; }
@@ -194,8 +194,8 @@ function Navbar() {
 function MediaCard({ item, type, index }) {
   const navigate = useNavigate();
   const id = item.id;
-  const poster = item.poster_path 
-    ? `https://image.tmdb.org/t/p/w500${item.poster_path}` 
+  const poster = item.poster_path
+    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
     : (item.poster || 'https://via.placeholder.com/300x450/13162a/fff?text=No+Poster');
   const title = item.title || item.name || item.show_name || 'Unknown Title';
   const year = (item.release_date || item.first_air_date || item.air_date || '').substring(0, 4);
@@ -207,7 +207,7 @@ function MediaCard({ item, type, index }) {
       if (payload.results && payload.results[0]) {
         navigate(`/tv/${payload.results[0].id}/${item.season}/${item.episode}`);
       } else {
-         navigate(`/search/${encodeURIComponent(item.search_title)}`);
+        navigate(`/search/${encodeURIComponent(item.search_title)}`);
       }
     } else {
       navigate(`/${type}/${id}`);
@@ -215,11 +215,11 @@ function MediaCard({ item, type, index }) {
   };
 
   return (
-    <motion.div 
-      className="movie-card" 
-      onClick={handleClick} 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <motion.div
+      className="movie-card"
+      onClick={handleClick}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 10) * 0.05 }}
     >
       <div className="poster-wrap">
@@ -317,12 +317,12 @@ function HomePage() {
               </div>
               <div className="grid">
                 {latestEpisodes.map((ep, i) => (
-                  <motion.div 
-                    key={ep.id + 'ep'} 
-                    className="latest-episode-card movie-card" 
-                    onClick={() => navigate(`/tv/${ep.id}/${ep.season}/${ep.episode}`)} 
-                    initial={{ opacity: 0, y: 20 }} 
-                    animate={{ opacity: 1, y: 0 }} 
+                  <motion.div
+                    key={ep.id + 'ep'}
+                    className="latest-episode-card movie-card"
+                    onClick={() => navigate(`/tv/${ep.id}/${ep.season}/${ep.episode}`)}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
                     <div className="poster-wrap">
@@ -370,7 +370,7 @@ function HomePage() {
               {kdrama.slice(0, 6).map((k, i) => <MediaCard key={k.id} item={k} type="tv" index={i} />)}
             </div>
           </div>
-          
+
           <div style={{ marginBottom: '4rem' }}>
             <div className="section-header">
               <h2 className="section-title"><Film /> Kollywood Hits (Tamil Hub)</h2>
@@ -379,7 +379,7 @@ function HomePage() {
             <div className="grid">
               {tamil.slice(0, 6).map((k, i) => <MediaCard key={k.id} item={k} type="movie" index={i} />)}
             </div>
-            <p style={{textAlign: 'center', marginTop: '1rem', color: '#8a8fa8', fontSize: '0.85rem'}}>Select 'S1 (Net)' or 'S3 (Mulv)' inside to potentially unlock regional audio tracks when available.</p>
+            <p style={{ textAlign: 'center', marginTop: '1rem', color: '#8a8fa8', fontSize: '0.85rem' }}>Select 'S1 (Net)' or 'S3 (Mulv)' inside to potentially unlock regional audio tracks when available.</p>
           </div>
         </>
       )}
@@ -418,7 +418,7 @@ function AnimePage() {
           </button>
         ))}
       </div>
-      {loading ? <div className="page-loader"><div className="loader"/></div> : (
+      {loading ? <div className="page-loader"><div className="loader" /></div> : (
         <div className="grid">{items.map((t, i) => <MediaCard key={t.id} item={t} type="tv" index={i} />)}</div>
       )}
     </div>
@@ -436,7 +436,7 @@ function KDramaPage() {
   return (
     <div className="fade-in">
       <h1 className="section-title" style={{ marginBottom: '2rem' }}><Heart /> K-Drama Central</h1>
-      {loading ? <div className="page-loader"><div className="loader"/></div> : (
+      {loading ? <div className="page-loader"><div className="loader" /></div> : (
         <div className="grid">{items.map((t, i) => <MediaCard key={t.id} item={t} type="tv" index={i} />)}</div>
       )}
     </div>
@@ -467,8 +467,8 @@ function TamilPage() {
   return (
     <div className="fade-in">
       <h1 className="section-title" style={{ marginBottom: '2rem' }}><Film /> Tamil Cinema Hub</h1>
-      <p style={{color: '#8a8fa8', marginBottom: '2rem'}}>Use multi-servers inside movies or series for regional dubbed track access.</p>
-      {loading ? <div className="page-loader"><div className="loader"/></div> : (
+      <p style={{ color: '#8a8fa8', marginBottom: '2rem' }}>Use multi-servers inside movies or series for regional dubbed track access.</p>
+      {loading ? <div className="page-loader"><div className="loader" /></div> : (
         <>
           <div style={{ marginBottom: '4rem' }}>
             <h2 className="section-title" style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>Top Tamil Anime (Native & Dubbed Indexed)</h2>
@@ -500,10 +500,10 @@ function ServerHubPage() {
         if (payload && payload.result) {
           setVapiEps(payload.result.items || []);
         } else {
-           // Fallback to local node.js API backend if running
-           const localRes = await fetch(`http://localhost:5000/api/vapi/episode/latest/1`);
-           const localPayload = await localRes.json();
-           if (localPayload) setVapiEps(localPayload.items || []);
+          // Fallback to local node.js API backend if running
+          const localRes = await fetch(`https://streaming-web-n6mi.onrender.com`);
+          const localPayload = await localRes.json();
+          if (localPayload) setVapiEps(localPayload.items || []);
         }
       } catch (err) {
         console.warn("VAPI Fetch failed, using fallback mock or backend must be running.", err);
@@ -519,22 +519,22 @@ function ServerHubPage() {
       <div className="section-header">
         <h1 className="section-title" style={{ color: '#00e5ff' }}><Layers /> Raw Server API (Latest Episodes VAPI)</h1>
       </div>
-      <p style={{color: '#8a8fa8', marginBottom: '2rem'}}>
+      <p style={{ color: '#8a8fa8', marginBottom: '2rem' }}>
         Direct connection to `vapi/episode/latest/:page`. If list is empty, ensure your local Node.js backend proxy is running.
       </p>
 
-      {loading ? <div className="page-loader"><div className="loader"/></div> : (
+      {loading ? <div className="page-loader"><div className="loader" /></div> : (
         <div className="grid">
           {vapiEps.length > 0 ? vapiEps.map((ep, i) => (
-            <motion.div 
-               key={ep.imdb_id + ep.season + ep.episode + i} 
-               className="movie-card" 
-               initial={{ opacity: 0, y: 20 }} 
-               animate={{ opacity: 1, y: 0 }} 
-               onClick={() => navigate(`/tv/${ep.tmdb_id}/${ep.season}/${ep.episode}`)}
+            <motion.div
+              key={ep.imdb_id + ep.season + ep.episode + i}
+              className="movie-card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => navigate(`/tv/${ep.tmdb_id}/${ep.season}/${ep.episode}`)}
             >
               <div className="poster-wrap">
-                <span className="type-badge" style={{background: '#ff4081'}}>S{ep.season} E{ep.episode}</span>
+                <span className="type-badge" style={{ background: '#ff4081' }}>S{ep.season} E{ep.episode}</span>
                 <img src={ep.poster_path ? `https://image.tmdb.org/t/p/w500${ep.poster_path}` : 'https://via.placeholder.com/300x450/13162a/fff'} alt="VAPI Raw" className="movie-poster" />
                 <div className="poster-overlay"><div className="play-icon"><Play size={24} fill="white" color="white" /></div></div>
               </div>
@@ -589,17 +589,17 @@ function PlayerFrame({ src }) {
   const forceFullscreenMode = () => {
     const elem = wrapperRef.current;
     if (elem) {
-      if (elem.requestFullscreen) { elem.requestFullscreen(); } 
-      else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+      if (elem.requestFullscreen) { elem.requestFullscreen(); }
+      else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
       else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
     }
   };
-  
+
   return (
     <div className="player-wrapper fade-in" ref={wrapperRef} style={{ background: '#000', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', position: 'relative' }}>
-      
-      <button 
-        onClick={forceFullscreenMode} 
+
+      <button
+        onClick={forceFullscreenMode}
         style={{ position: 'absolute', top: 15, right: 15, zIndex: 99, background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
       >
         [ ] Force Fullscreen
@@ -607,10 +607,10 @@ function PlayerFrame({ src }) {
 
       <div className="player-container" style={{ position: 'relative', width: '100%', height: '100%', aspectRatio: '16/9' }}>
         {loading && (
-           <div className="loader-wrap" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-             <div className="loader" style={{ width: 40, height: 40, border: '4px solid #1e2140', borderBottomColor: '#00e5ff', borderRadius: '50%', animation: 'rotation 1s linear infinite' }} />
-             <p style={{ marginTop: '1rem', color: '#8a8fa8', fontWeight: 'bold' }}>Connecting to Network...</p>
-           </div>
+          <div className="loader-wrap" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div className="loader" style={{ width: 40, height: 40, border: '4px solid #1e2140', borderBottomColor: '#00e5ff', borderRadius: '50%', animation: 'rotation 1s linear infinite' }} />
+            <p style={{ marginTop: '1rem', color: '#8a8fa8', fontWeight: 'bold' }}>Connecting to Network...</p>
+          </div>
         )}
 
         <iframe
@@ -646,7 +646,7 @@ function MoviePlayer() {
   return (
     <div className="player-page fade-in" style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '1rem' }}>
       <button className="back-btn" onClick={() => navigate(-1)}><ChevronLeft size={20} /> Go Back</button>
-      
+
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Film size={24} color="var(--primary)" /> {info ? info.title : 'Loading Title...'}
@@ -664,15 +664,15 @@ function MoviePlayer() {
         <button onClick={() => setServer(5)} className={`server-btn ${server === 5 ? 'active' : ''}`}>S5 (Smash)</button>
         <button onClick={() => setServer(6)} className={`server-btn ${server === 6 ? 'active' : ''}`}>S6 (Su)</button>
         <button onClick={() => setServer(7)} className={`server-btn ${server === 7 ? 'active' : ''}`}>S7 (Link)</button>
-        <button onClick={() => setServer(8)} className={`server-btn ${server === 8 ? 'active' : ''}`} style={{background: server === 8 ? '#ff4081' : ''}}>S8 (Tamil Hub)</button>
+        <button onClick={() => setServer(8)} className={`server-btn ${server === 8 ? 'active' : ''}`} style={{ background: server === 8 ? '#ff4081' : '' }}>S8 (Tamil Hub)</button>
       </div>
 
       <div className="stream-info" style={{ marginTop: '3rem', padding: '2rem', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)' }}>
         <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{info?.title}</h3>
         <p style={{ color: '#8a8fa8' }}>{info?.overview}</p>
         <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', color: '#fff' }}>
-          <span style={{background: 'rgba(255,255,255,0.1)', padding: '0.4rem 1rem', borderRadius: '12px'}}>⭐ {info?.vote_average ? Number(info.vote_average).toFixed(1) : '?'} / 10</span>
-          <span style={{background: 'rgba(255,255,255,0.1)', padding: '0.4rem 1rem', borderRadius: '12px'}}>📅 {info?.release_date}</span>
+          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '0.4rem 1rem', borderRadius: '12px' }}>⭐ {info?.vote_average ? Number(info.vote_average).toFixed(1) : '?'} / 10</span>
+          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '0.4rem 1rem', borderRadius: '12px' }}>📅 {info?.release_date}</span>
         </div>
       </div>
     </div>
@@ -691,14 +691,14 @@ function TvPlayer() {
 
   const [server, setServer] = useState(1);
   const [info, setInfo] = useState(null);
-  
+
   useEffect(() => { fetchDetails('tv', id).then(setInfo); }, [id]);
 
   const embedUrl = getEmbedUrl(server, 'tv', id, season, episode, info?.name);
 
   const totalSeasons = (info?.seasons || []).filter(s => s.season_number > 0);
   const currentSeasonData = totalSeasons.find(s => s.season_number === season);
-  const epsCount = currentSeasonData ? currentSeasonData.episode_count : 24; 
+  const epsCount = currentSeasonData ? currentSeasonData.episode_count : 24;
 
   const totalEpisodes = Array.from({ length: epsCount }, (_, i) => i + 1);
 
@@ -719,45 +719,45 @@ function TvPlayer() {
 
       <h3 style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--text-main)' }}>Video blocked or frozen? Click below to cycle databases!</h3>
       <div className="server-selector" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
-         <button onClick={() => setServer(1)} className={`server-btn ${server === 1 ? 'active' : ''}`}>S1 (Net)</button>
+        <button onClick={() => setServer(1)} className={`server-btn ${server === 1 ? 'active' : ''}`}>S1 (Net)</button>
         <button onClick={() => setServer(2)} className={`server-btn ${server === 2 ? 'active' : ''}`}>S2 (Auto)</button>
         <button onClick={() => setServer(3)} className={`server-btn ${server === 3 ? 'active' : ''}`}>S3 (Mulv)</button>
         <button onClick={() => setServer(4)} className={`server-btn ${server === 4 ? 'active' : ''}`}>S4 (V2)</button>
         <button onClick={() => setServer(5)} className={`server-btn ${server === 5 ? 'active' : ''}`}>S5 (Smash)</button>
         <button onClick={() => setServer(6)} className={`server-btn ${server === 6 ? 'active' : ''}`}>S6 (Su)</button>
         <button onClick={() => setServer(7)} className={`server-btn ${server === 7 ? 'active' : ''}`}>S7 (Link)</button>
-        <button onClick={() => setServer(8)} className={`server-btn ${server === 8 ? 'active' : ''}`} style={{background: server === 8 ? '#ff4081' : ''}}>S8 (Tamil Hub)</button>
+        <button onClick={() => setServer(8)} className={`server-btn ${server === 8 ? 'active' : ''}`} style={{ background: server === 8 ? '#ff4081' : '' }}>S8 (Tamil Hub)</button>
       </div>
 
       <div style={{ marginTop: '3rem', background: 'var(--surface)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border)' }}>
-         <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Layers size={20} /> Select Season</h3>
-         
-         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
-           {totalSeasons.length > 0 ? totalSeasons.map(s => (
-             <button 
-                key={s.season_number} 
-                onClick={() => navigate(`/tv/${id}/${s.season_number}/1`, { replace: true })}
-                style={{ background: season === s.season_number ? 'var(--primary)' : 'var(--surface-light)', color: season === s.season_number ? '#fff' : 'var(--text-muted)', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}
-             >
-               Season {s.season_number}
-             </button>
-           )) : <p>Loading seasons logic...</p>}
-         </div>
+        <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Layers size={20} /> Select Season</h3>
 
-         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.75rem' }}>
-           {totalEpisodes.map(ep => (
-             <button 
-                key={ep}
-                onClick={() => navigate(`/tv/${id}/${season}/${ep}`, { replace: true })}
-                style={{ background: episode === ep ? 'var(--gradient-primary)' : 'var(--surface-light)', color: episode === ep ? '#fff' : 'var(--text-main)', border: episode === ep ? 'none' : '1px solid var(--border)', padding: '1rem 0.5rem', borderRadius: '12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', transition: 'all 0.2s' }}
-             >
-               <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{ep}</span>
-               <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Episode {ep}</span>
-             </button>
-           ))}
-         </div>
+        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
+          {totalSeasons.length > 0 ? totalSeasons.map(s => (
+            <button
+              key={s.season_number}
+              onClick={() => navigate(`/tv/${id}/${s.season_number}/1`, { replace: true })}
+              style={{ background: season === s.season_number ? 'var(--primary)' : 'var(--surface-light)', color: season === s.season_number ? '#fff' : 'var(--text-muted)', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}
+            >
+              Season {s.season_number}
+            </button>
+          )) : <p>Loading seasons logic...</p>}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.75rem' }}>
+          {totalEpisodes.map(ep => (
+            <button
+              key={ep}
+              onClick={() => navigate(`/tv/${id}/${season}/${ep}`, { replace: true })}
+              style={{ background: episode === ep ? 'var(--gradient-primary)' : 'var(--surface-light)', color: episode === ep ? '#fff' : 'var(--text-main)', border: episode === ep ? 'none' : '1px solid var(--border)', padding: '1rem 0.5rem', borderRadius: '12px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', transition: 'all 0.2s' }}
+            >
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{ep}</span>
+              <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Episode {ep}</span>
+            </button>
+          ))}
+        </div>
       </div>
-      
+
       <div className="stream-info" style={{ marginTop: '3rem', padding: '2rem', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)' }}>
         <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{info?.name}</h3>
         <p style={{ color: '#8a8fa8' }}>{info?.overview}</p>
